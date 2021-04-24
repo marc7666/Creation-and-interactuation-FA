@@ -11,45 +11,30 @@ public class LecturaAutomat extends CommandLineProgram {
     public static final String ANSI_RED = "\u001B[31m";
 
     public void run() {
-        System.out.println(ANSI_CYAN + "---------- Lectura de dades ----------");
-        System.out.println(ANSI_YELLOW + "NOTA: els estats es numeren de la següent manera: 0, 1, 2, ..., n");
-        /**
-         * Introducció del nombre d'estats
-         **/
-        int nombreEstats = readInt(ANSI_RESET + "Introdueix el nombre d'estats de l'autòmat: \n");
-        /**
-         * Introducció del nombre d'estats finals
-         **/
-        int estatsFinalsNombre = readInt("Quants estats finals té l'autòmat? \n");
-        /**
-         * Introducció dels estats finals
-         **/
+        System.out.println(ANSI_CYAN + "---------- Data reading ----------");
+        System.out.println(ANSI_YELLOW + "NOTE: the states are numbered as follows: 0, 1, 2, ..., n");
+        /*States number introduction*/
+        int nombreEstats = readInt(ANSI_RESET + "Enter the number of states of the automaton \n");
+        /*Final states number introduction*/
+        int estatsFinalsNombre = readInt("How many finals states has the automaton? \n");
+        /*Final states introduction*/
         int[] estatsFinals = introduccioestatsFinals(estatsFinalsNombre);
-        /**
-         * Introducció del nombre de símbols de l'alfabet
-         **/
-        int alfabetNombre = readInt("Quants símbols té l'alfabet? \n");
-        /**
-         * Introducció de l'alfabet
-         **/
+        /*Introduction if the number of symbols of the alphabet*/
+        int alfabetNombre = readInt("How many symbols has the alphabet? \n");
+        /*Alphabet introduction*/
         String[] alfabet = introduccioAlfabet(alfabetNombre);
-        /**
-         * Introducció de la funció de transició
-         **/
+        /*Introduction of the transition function*/
         int[][] funcioTrnasicio = funcioDeTrnasicio(nombreEstats, alfabetNombre, alfabet);
-        /**
-         * Visualitzacio de dades per pantalla
-         **/
-        System.out.println(ANSI_CYAN + "---------- Visualitzacio de dades ----------" + ANSI_RESET);
-        veureDades(nombreEstats, estatsFinalsNombre, estatsFinals, alfabetNombre, alfabet, funcioTrnasicio); //Visualitzacio de dades per pantall
-        /**
-         * Proces de demanda de la paraula a llegir
-         **/
-        String paraula = readLine("Introdueix una paraula per entrar a la maquina: ");
+        /*Data viewing*/
+        System.out.println(ANSI_CYAN + "---------- Data viewing ----------" + ANSI_RESET);
+        veureDades(nombreEstats, estatsFinalsNombre, estatsFinals, alfabetNombre, alfabet, funcioTrnasicio);
+        /*Process of demand of the reading word*/
+        String paraula = readLine("Write a word to enter into the automaton: ");
         /**
          * Tractament de la paraula
          **/
-        int ultimEstat = lecturaParaula(paraula, estatsFinals, funcioTrnasicio, alfabet);
+        System.out.println(ANSI_CYAN + "---------- Processant la paraula ----------");
+        int ultimEstat = lecturaParaula(paraula, funcioTrnasicio, alfabet);
         if (acceptacioParaula(ultimEstat, estatsFinals)) {
             System.out.println(ANSI_GREEN + "La paraula: '" + paraula + "' ha estat acceptada.");
         } else {
@@ -58,13 +43,13 @@ public class LecturaAutomat extends CommandLineProgram {
 
     }
 
-    private int lecturaParaula(String paraula, int[] estatsFinals, int[][] funcioTrnasicio, String[] alfabet) {
+    private int lecturaParaula(String paraula, int[][] funcioTrnasicio, String[] alfabet) {
         int estatActual = 0;
         for (int i = 0; i < paraula.length(); i++) {
             String simbol = paraula.substring(i, i + 1);
             int indexSimbol = index(alfabet, simbol);
             int estatSeguent = funcioTrnasicio[estatActual][indexSimbol];
-            System.out.println("Estat actual: " + estatActual + ", simbol llegit: " + simbol + ", estat seguent: " + estatSeguent);
+            System.out.println(ANSI_PURPLE + "Estat actual: " + ANSI_RESET + estatActual + ANSI_PURPLE + ", simbol llegit: " + ANSI_RESET + simbol + ANSI_PURPLE + ", estat seguent: " + ANSI_RESET + estatSeguent);
             estatActual = estatSeguent;
         }
         return estatActual;
