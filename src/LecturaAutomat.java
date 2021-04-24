@@ -1,7 +1,6 @@
 import acm.program.CommandLineProgram;
 
 import java.util.Arrays;
-import java.util.StringTokenizer;
 
 public class LecturaAutomat extends CommandLineProgram {
     public static final String ANSI_CYAN = "\u001B[36m";
