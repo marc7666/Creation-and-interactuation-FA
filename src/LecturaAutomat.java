@@ -7,13 +7,15 @@ public class LecturaAutomat extends CommandLineProgram {
         int nombreEstats = readInt("Introdueix el nombre d'estats de l'autòmat: \n");
         int estatsFinalsNombre = readInt("Quants estats finals té l'autòmat? \n");
         int[] estatsFinals = introduccioestatsFinals(estatsFinalsNombre);
-        int alfabetNombre = readInt("Quants símbols té l'alfabet? \n");
-        boolean esBinari = readBoolean("És una alfabet binari? \n");
+        boolean esBinari = readBoolean("És una alfabet binari? (True o False) \n");
         int[] alfabet1 = new int[0];
         String[] alfabet2 = new String[0];
+        int alfabetNombre = 0;
         if (esBinari) {
-            alfabet1 = introduccioAlfabetBinari(alfabetNombre);
+            alfabet1 = new int[]{0, 1};
+            alfabetNombre = 2;
         } else {
+            alfabetNombre = readInt("Quants símbols té l'alfabet? \n");
             alfabet2 = introduccioAlfabetLletres(alfabetNombre);
         }
         veureDades(nombreEstats, estatsFinalsNombre, estatsFinals, alfabetNombre, esBinari, alfabet1, alfabet2);
@@ -25,7 +27,7 @@ public class LecturaAutomat extends CommandLineProgram {
         print("Nombre d'estats finals: " + estatsFinalsNombre + "\n");
         print("Estats finals: " + Arrays.toString(estatsFinals) + "\n");
         print("Nombre de simbols de l'alfabet: " + alfabetNombre + "\n");
-        print("Binari?" + esBinari + "\n");
+        print("Binari? " + esBinari + "\n");
         if (esBinari) {
             print("Alfabet: " + Arrays.toString(alfabet1) + "\n");
         } else {
