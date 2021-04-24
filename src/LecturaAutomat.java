@@ -1,4 +1,5 @@
 import acm.program.CommandLineProgram;
+import jdk.jshell.spi.ExecutionControl;
 
 import java.util.Arrays;
 
@@ -16,12 +17,29 @@ public class LecturaAutomat extends CommandLineProgram {
         String[] estatsFinals = introduccioestatsFinals(estatsFinalsNombre); //Introduccio estats finals
         int alfabetNombre = readInt("Quants símbols té l'alfabet? \n"); //Introduccio nombre símbols alfabet
         String[] alfabet = introduccioAlfabet(alfabetNombre); //Introduccio alfabet
+        String[][] funcioTrnasicio = funcioDeTrnasicio(nombreEstats, alfabetNombre, alfabet);
+
         /*--------------------------------------------------------------------------------------------------------------------*/
         /*Visualitzacio de dades per pantalla*/
         System.out.println(ANSI_CYAN + "---------- Visualitzacio de dades ----------" + ANSI_RESET);
-        veureDades(nombreEstats, estatsFinalsNombre, estatsFinals, alfabetNombre, alfabet); //Visualitzacio de dades per pantalla
+        veureDades(nombreEstats, estatsFinalsNombre, estatsFinals, alfabetNombre, alfabet); //Visualitzacio de dades per pantall
+        /*--------------------------------------------------------------------------------------------------------------------*/
+        /*Proces de demanda de la paraula a llegir*/
+        String paraula = readLine("Introdueix una paraula per entrar a la maquina: ");
+        /*--------------------------------------------------------------------------------------------------------------------*/
+        /*Tractament de la paraula*/
+
     }
 
+    private String[][] funcioDeTrnasicio(int nombreEstats, int alfabetNombre, String[] alfabet) {
+        String[][] funciotransicio = new String[alfabetNombre][nombreEstats];
+        for (int i = 0; i < alfabetNombre; i++) {
+            for (int j = 0; j < nombreEstats; j++) {
+                funciotransicio[i][j] = readLine("Desde el estat " + i + "i llegint el simbol " + alfabet[j] + "anem al estat => ");
+            }
+        }
+        return funciotransicio;
+    }
 
     /**
      * Aquesta funcio treu per pantalla totes les dades per pantalla
