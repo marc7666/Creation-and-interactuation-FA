@@ -3,6 +3,7 @@ import acm.program.CommandLineProgram;
 import java.util.Arrays;
 
 public class LecturaAutomat extends CommandLineProgram {
+    /*Ansi color codes*/
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_PURPLE = "\u001B[35m";
@@ -10,64 +11,69 @@ public class LecturaAutomat extends CommandLineProgram {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_RED = "\u001B[31m";
 
+    /*Main function*/
     public void run() {
         System.out.println(ANSI_CYAN + "---------- Data reading ----------");
         System.out.println(ANSI_YELLOW + "NOTE: the states are numbered as follows: 0, 1, 2, ..., n");
         /*States number introduction*/
-        int nombreEstats = readInt(ANSI_RESET + "Enter the number of states of the automaton \n");
+        int statesNumber = readInt(ANSI_RESET + "Enter the number of states of the automaton \n");
         /*Final states number introduction*/
-        int estatsFinalsNombre = readInt("How many finals states has the automaton? \n");
+        int finalStatesNumber = readInt("How many finals states has the automaton? \n");
         /*Final states introduction*/
-        int[] estatsFinals = introduccioestatsFinals(estatsFinalsNombre);
+        int[] finalStates = finalStatesIntroduction(finalStatesNumber);
         /*Introduction if the number of symbols of the alphabet*/
-        int alfabetNombre = readInt("How many symbols has the alphabet? \n");
+        int AlphabetSymbolsNumber = readInt("How many symbols has the alphabet? \n");
         /*Alphabet introduction*/
-        String[] alfabet = introduccioAlfabet(alfabetNombre);
+        String[] alphabet = alphabetIntroduction(AlphabetSymbolsNumber);
         /*Introduction of the transition function*/
-        int[][] funcioTrnasicio = funcioDeTrnasicio(nombreEstats, alfabetNombre, alfabet);
+        int[][] transitionFunction = transitionFunctionMethod(statesNumber, AlphabetSymbolsNumber, alphabet);
         /*Data viewing*/
         System.out.println(ANSI_CYAN + "---------- Data viewing ----------" + ANSI_RESET);
-        veureDades(nombreEstats, estatsFinalsNombre, estatsFinals, alfabetNombre, alfabet, funcioTrnasicio);
+        veureDades(statesNumber, finalStatesNumber, finalStates, AlphabetSymbolsNumber, alphabet, transitionFunction);
         /*Process of demand of the reading word*/
-        String paraula = readLine("Write a word to enter into the automaton: ");
-        /**
-         * Tractament de la paraula
-         **/
-        System.out.println(ANSI_CYAN + "---------- Processant la paraula ----------");
-        int ultimEstat = lecturaParaula(paraula, funcioTrnasicio, alfabet);
-        if (acceptacioParaula(ultimEstat, estatsFinals)) {
-            System.out.println(ANSI_GREEN + "La paraula: '" + paraula + "' ha estat acceptada.");
+        String word = readLine("Write a word to enter into the automaton: ");
+        /*Word treatment*/
+        System.out.println(ANSI_CYAN + "---------- Processing the word ----------");
+        int lastState = wordReading(word, transitionFunction, alphabet);
+        if (wordAcceptation(lastState, finalStates)) {
+            System.out.println(ANSI_GREEN + "The word: '" + word + "' has been accepted.");
         } else {
-            System.out.println(ANSI_RED + "La paraula: '" + paraula + "' no ha estat acceptada.");
+            System.out.println(ANSI_RED + "The word: '" + word + "' hasn't been accepted.");
         }
 
     }
 
-    private int lecturaParaula(String paraula, int[][] funcioTrnasicio, String[] alfabet) {
-        int estatActual = 0;
-        for (int i = 0; i < paraula.length(); i++) {
-            String simbol = paraula.substring(i, i + 1);
-            int indexSimbol = index(alfabet, simbol);
-            int estatSeguent = funcioTrnasicio[estatActual][indexSimbol];
-            System.out.println(ANSI_PURPLE + "Estat actual: " + ANSI_RESET + estatActual + ANSI_PURPLE + ", simbol llegit: " + ANSI_RESET + simbol + ANSI_PURPLE + ", estat seguent: " + ANSI_RESET + estatSeguent);
-            estatActual = estatSeguent;
+    private int wordReading(String word, int[][] transitionFunction, String[] alphabet) {
+        int actualState = 0;
+        for (int i = 0; i < word.length(); i++) {
+            String simbol = word.substring(i, i + 1);
+            int indexSimbol = index(alphabet, simbol);
+            int estatSeguent = transitionFunction[actualState][indexSimbol];
+            System.out.println(ANSI_PURPLE + "Actual state: " + ANSI_RESET + actualState + ANSI_PURPLE + ", symbol read: " + ANSI_RESET + simbol + ANSI_PURPLE + ", next state: " + ANSI_RESET + estatSeguent);
+            actualState = estatSeguent;
         }
-        return estatActual;
+        return actualState;
     }
 
-    private boolean acceptacioParaula(int estatActual, int[] estatsFinals) {
-        for (int i = 0; i < estatsFinals.length; i++) {
-            if (estatActual == estatsFinals[i]) {
+    /**
+     * This function decides if the word has to be accepted
+     **/
+    private boolean wordAcceptation(int actualState, int[] finalStates) {
+        for (int i = 0; i < finalStates.length; i++) {
+            if (actualState == finalStates[i]) {
                 return true;
             }
         }
         return false;
     }
 
-    private int index(String[] alfabet, String simbol) {
+    /**
+     * This word returns the index of the symbol in the alphabet array
+     **/
+    private int index(String[] alphabet, String simbol) {
         int index = 0;
-        for (int i = 0; i < alfabet.length; i++) {
-            if (alfabet[i].equalsIgnoreCase(simbol)) {
+        for (int i = 0; i < alphabet.length; i++) {
+            if (alphabet[i].equalsIgnoreCase(simbol)) {
                 index = i;
             }
         }
@@ -75,37 +81,37 @@ public class LecturaAutomat extends CommandLineProgram {
     }
 
     /**
-     * Aquesta funció retorna una matriu que conté la funció de transició de l'autòmat
+     * This function returns a matrix with the transition function
      **/
-    private int[][] funcioDeTrnasicio(int nombreEstats, int alfabetNombre, String[] alfabet) {
-        int[][] funciotransicio = new int[nombreEstats][alfabetNombre];
-        for (int i = 0; i < nombreEstats; i++) {
-            for (int j = 0; j < alfabetNombre; j++) {
-                funciotransicio[i][j] = readInt("Desde el estat " + (i) + " i llegint el simbol " + "'" + alfabet[j] + "'" + " anem al estat => ");
+    private int[][] transitionFunctionMethod(int statesNumber, int AlphabetSymbolsNumber, String[] alphabet) {
+        int[][] transitionFunctionVariable = new int[statesNumber][AlphabetSymbolsNumber];
+        for (int i = 0; i < statesNumber; i++) {
+            for (int j = 0; j < AlphabetSymbolsNumber; j++) {
+                transitionFunctionVariable[i][j] = readInt("From the state " + (i) + " and reading the symbol " + "'" + alphabet[j] + "'" + " we go to the state => ");
             }
         }
-        return funciotransicio;
+        return transitionFunctionVariable;
     }
 
     /**
-     * Aquesta funcio treu per pantalla totes les dades per pantalla
+     * This function prints the data
      **/
-    private void veureDades(int nombreEstats, int estatsFinalsNombre, int[] estatsFinals, int alfabetNombre, String[] alfabet, int[][] funciotransicio) {
-        System.out.println(ANSI_YELLOW + "NOTA: els estats es numeren de la següent manera: 0, 1, 2, ..., n");
-        System.out.println(ANSI_PURPLE + "Nombre d'estats: " + ANSI_RESET + nombreEstats);
-        System.out.println(ANSI_PURPLE + "Nombre d'estats finals: " + ANSI_RESET + estatsFinalsNombre);
-        System.out.println(ANSI_PURPLE + "Estats finals: " + ANSI_RESET + Arrays.toString(estatsFinals));
-        System.out.println(ANSI_PURPLE + "Nombre de simbols de l'alfabet: " + ANSI_RESET + alfabetNombre);
-        System.out.println(ANSI_PURPLE + "Alfabet: " + ANSI_RESET + Arrays.toString(alfabet));
-        System.out.println(ANSI_PURPLE + "Funcio de transicio: ");
-        for (int i = 0; i <= estatsFinalsNombre; i++) {
-            print(ANSI_GREEN + "\t" + alfabet[i] + "  ");
+    private void veureDades(int statesNumber, int finalStatesNumber, int[] finalStates, int AlphabetSymbolsNumber, String[] alphabet, int[][] transitionFunctionVariable) {
+        System.out.println(ANSI_YELLOW + "NOTE: the states are numbered as follows: 0, 1, 2, ..., n");
+        System.out.println(ANSI_PURPLE + "Number of states: " + ANSI_RESET + statesNumber);
+        System.out.println(ANSI_PURPLE + "Number of final states: " + ANSI_RESET + finalStatesNumber);
+        System.out.println(ANSI_PURPLE + "Final states: " + ANSI_RESET + Arrays.toString(finalStates));
+        System.out.println(ANSI_PURPLE + "Number of symbols of the alphabet: " + ANSI_RESET + AlphabetSymbolsNumber);
+        System.out.println(ANSI_PURPLE + "Alphabet: " + ANSI_RESET + Arrays.toString(alphabet));
+        System.out.println(ANSI_PURPLE + "Transition function: ");
+        for (int i = 0; i <= finalStatesNumber; i++) {
+            print(ANSI_GREEN + "\t" + alphabet[i] + "  ");
         }
         print("\n");
-        for (int i = 0; i < nombreEstats; i++) {
+        for (int i = 0; i < statesNumber; i++) {
             print(ANSI_GREEN + i + "\t");
-            for (int j = 0; j < alfabetNombre; j++) {
-                print(ANSI_RESET + funciotransicio[i][j] + "\t");
+            for (int j = 0; j < AlphabetSymbolsNumber; j++) {
+                print(ANSI_RESET + transitionFunctionVariable[i][j] + "\t");
             }
             print("\n");
         }
@@ -113,24 +119,24 @@ public class LecturaAutomat extends CommandLineProgram {
     }
 
     /**
-     * Aquesta funcio retorna una array de strings amb l'alfabet que l'usuari vulgui
+     * This function returns an array with the alphabet
      **/
-    private String[] introduccioAlfabet(int alfabetNombre) {
-        String[] alfabet = new String[alfabetNombre];
-        for (int i = 0; i < alfabetNombre; i++) {
-            alfabet[i] = readLine("Introdueix el símbol " + (i + 1) + ": \n");
+    private String[] alphabetIntroduction(int AlphabetSymbolsNumber) {
+        String[] alphabet = new String[AlphabetSymbolsNumber];
+        for (int i = 0; i < AlphabetSymbolsNumber; i++) {
+            alphabet[i] = readLine("Introduce the symbol " + (i + 1) + ": \n");
         }
-        return alfabet;
+        return alphabet;
     }
 
 
     /**
-     * Aquesta funcio retorna una array de strings amb els estats finals
+     * This function returns an array with the final states
      **/
-    private int[] introduccioestatsFinals(int nombreFinals) {
+    private int[] finalStatesIntroduction(int nombreFinals) {
         int[] finals = new int[nombreFinals];
         for (int i = 0; i < nombreFinals; i++) {
-            finals[i] = readInt("Introdueix l'estat final " + (i + 1) + " \n");
+            finals[i] = readInt("Introduce the final state " + (i + 1) + " \n");
         }
         return finals;
     }
