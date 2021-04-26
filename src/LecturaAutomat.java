@@ -11,11 +11,13 @@ public class LecturaAutomat extends CommandLineProgram {
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_BOLD = "\u001B[1m";
+    public static final String ANSI_BLUE = "\u001B[34m";
 
     /*Main function*/
     public void run() {
         System.out.println(ANSI_CYAN + "---------- Data reading ----------");
-        System.out.println(ANSI_YELLOW + "NOTE: the states are numbered as follows: 0, 1, 2, ..., n");
+        System.out.println(ANSI_BOLD + ANSI_YELLOW + "NOTE: the states are numbered as follows: 0, 1, 2, ..., n");
 
         /*States number introduction*/
         int statesNumber = readInt(ANSI_RESET + "Enter the number of states of the automaton: \n");
@@ -37,7 +39,7 @@ public class LecturaAutomat extends CommandLineProgram {
 
         /*Data viewing*/
         System.out.println(ANSI_CYAN + "---------- Data viewing ----------" + ANSI_RESET);
-        veureDades(statesNumber, finalStatesNumber, finalStates, AlphabetSymbolsNumber, alphabet, transitionFunction);
+        dataViewing(statesNumber, finalStatesNumber, finalStates, AlphabetSymbolsNumber, alphabet, transitionFunction);
 
         /*Process of demand of the reading word*/
         String word = readLine("Write a word to enter into the automaton: ");
@@ -63,11 +65,16 @@ public class LecturaAutomat extends CommandLineProgram {
         String symbol; //This String will content the symbol read
         int nextState; //This variable will save the next state
         for (int i = 0; i < word.length(); i++) { //While the word has symbols to read
-            symbol = word.substring(i, i + 1); //Substring of the introduced word => Only 1 letter/symbol
-            int symbolIndex = index(alphabet, symbol); //Obtaining the symbol index in the alphabet array
-            nextState = transitionFunction[currentState][symbolIndex]; //Searching the new state
-            System.out.println(ANSI_PURPLE + "Actual state: " + ANSI_RESET + currentState + ANSI_PURPLE + ", symbol read: " + ANSI_RESET + symbol + ANSI_PURPLE + ", next state: " + ANSI_RESET + nextState);
-            currentState = nextState; //currentState updating
+            try {
+                symbol = word.substring(i, i + 1); //Substring of the introduced word => Only 1 letter/symbol
+                int symbolIndex = index(alphabet, symbol); //Obtaining the symbol index in the alphabet array
+                nextState = transitionFunction[currentState][symbolIndex]; //Searching the new state
+                System.out.println(ANSI_PURPLE + "Actual state: " + ANSI_RESET + currentState + ANSI_PURPLE + ", symbol read: " + ANSI_RESET + symbol + ANSI_PURPLE + ", next state: " + ANSI_RESET + nextState);
+                currentState = nextState; //currentState updating
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Transition not defined"); //If the transition is not defined and the introduced word needs that transition the program throws an IllegalStateException with the message "Transition not defined"
+            }
+
         }
         System.out.println(ANSI_PURPLE + "The automaton ends in the state: " + ANSI_RESET + currentState);
         return currentState;
@@ -103,6 +110,7 @@ public class LecturaAutomat extends CommandLineProgram {
      **/
     private int[][] transitionFunctionMethod(int statesNumber, int AlphabetSymbolsNumber, String[] alphabet) {
         int[][] transitionFunctionVariable = new int[statesNumber][AlphabetSymbolsNumber]; //Matrix that will content the transition function
+        System.out.println(ANSI_BOLD + ANSI_BLUE + "If any transition is not defined, write -1 on this way if you introduce a word that needs that transition the program will throw an exception" + ANSI_RESET);
         for (int i = 0; i < statesNumber; i++) { //Traversing the matrix while the user introduces the pertinent values of the transition function
             for (int j = 0; j < AlphabetSymbolsNumber; j++) {
                 transitionFunctionVariable[i][j] = readInt("From the state " + (i) + " and reading the symbol " + "'" + alphabet[j] + "'" + " we go to the state => ");
@@ -114,8 +122,7 @@ public class LecturaAutomat extends CommandLineProgram {
     /**
      * This function prints the data
      **/
-    private void veureDades(int statesNumber, int finalStatesNumber, int[] finalStates, int AlphabetSymbolsNumber, String[] alphabet, int[][] transitionFunctionVariable) {
-        System.out.println(ANSI_YELLOW + "NOTE: the states are numbered as follows: 0, 1, 2, ..., n");
+    private void dataViewing(int statesNumber, int finalStatesNumber, int[] finalStates, int AlphabetSymbolsNumber, String[] alphabet, int[][] transitionFunctionVariable) {
         System.out.println(ANSI_PURPLE + "Number of states: " + ANSI_RESET + statesNumber);
         System.out.println(ANSI_PURPLE + "Number of final states: " + ANSI_RESET + finalStatesNumber);
         System.out.println(ANSI_PURPLE + "Final states: " + ANSI_RESET + Arrays.toString(finalStates));
